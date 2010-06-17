@@ -33,16 +33,24 @@ with open(flu_rnai_file) as f:
         [entrez, delNS1, 
          vRNA, replication] = [float(x) for x in line.strip().split('\t')]
         ID = str(int(entrez))
-        if replication < float(0):
+        if replication < float(-1.5):
             replication_rnai[ID] = True
         all_rnai[ID] = True
 
 bg = set(network_genes & set(all_rnai.keys()))
+rep_set = set(replication_rnai.keys())
 print 'background', len(bg)
 print 'hubs in background', len(bg & hubs)
-print 'replication bg', len(set(replication_rnai.keys()) & bg)
-print 'replication hubs', len(hubs & set(replication_rnai.keys()))
+print 'replication bg', len(rep_set & bg)
+print 'replication hubs', len(hubs & rep_set)
 
-print utils_stats.fisher_positive_pval([len(bg & hubs), len(bg) - len(bg & hubs)],
-                                       [len(hubs & set(replication_rnai.keys())),
-                                        len(set(replication_rnai.keys()) & bg) - len(hubs & set(replication_rnai.keys()))])
+rep_nonHubs = set(set(rep_set & bg) - hubs)
+bg_hubs = set(bg & hubs) - rep_set
+bg_nonHubs = set(bg - hubs) - rep_nonHubs
+
+
+print len(bg_hubs), len(bg_nonHubs)
+print len(hubs & rep_set), len(rep_nonHubs)
+print utils_stats.fisher_positive_pval([len(bg_hubs), len(bg_nonHubs)],
+                                       [len(hubs & rep_set),
+                                        len(rep_nonHubs)])
