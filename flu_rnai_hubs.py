@@ -33,7 +33,7 @@ with open(flu_rnai_file) as f:
         [entrez, delNS1, 
          vRNA, replication] = [float(x) for x in line.strip().split('\t')]
         ID = str(int(entrez))
-        if replication < float(-1.5):
+        if vRNA > float(1):
             replication_rnai[ID] = True
         all_rnai[ID] = True
 
