@@ -26,6 +26,17 @@ def get_closest_distances(flu_strings, host_strings):
             dis = min([dis, d])
         print dis
 
+def print_closest_distances(elm, flu_strings, host_strings):
+    """For each flu sequence, find the distance to a human string.
+       If it is 0,1,2,3 print it."""
+
+    for flu_s in flu_strings:
+        for host_s in host_strings:
+            dis = Levenshtein.distance(flu_s, 
+                                       host_s)
+            if dis < 4:
+                print elm + '\t' + flu_s + '\t' + host_s + '\t' + str(dis)
+
 def count_0s(ls):
     count = 0
     for item in ls:
@@ -33,7 +44,7 @@ def count_0s(ls):
             count += 1
     return count
 
-def count_flu(protein2counts, all_elmSeqs):
+def count_flu(protein2counts, elm2seq):
     """Given hits from get_flu_counts, return ELMseq counts"""
     
     counts = defaultdict(utils.init_zero)
@@ -42,7 +53,7 @@ def count_flu(protein2counts, all_elmSeqs):
             for elmSeq in protein2counts[protein][seq]:
                 elm, sequence = elmSeq.split(':')
                 counts[elmSeq] += protein2counts[protein][seq][elmSeq]
-                all_elmSeqs[elmSeq] = True
+                elm2seq[elm][sequence] = True
     return counts
 
 def get_flu_counts(afile, proteins):
@@ -101,35 +112,25 @@ proteins = ('hemagglutinin', 'neuraminidase', 'nucleocapsid protein',
             'polymerase PB1', 'PB1-F2 protein')
 
 # count elm:seq occurence
-flu_counts = {}
+flu_elm2seq = defaultdict(dict)
 pre_flu_counts = {}
-host_counts = {}
-all_elmSeqs = {}
-
+flu_counts = {}
 for flu in flus:
     pre_flu_counts[flu] = get_flu_counts('../flu/flELM/results/' + flu + '.H5N1.elms', 
                                          proteins)
 
-flu_counts['human'] = count_flu(pre_flu_counts['human'], all_elmSeqs)
-flu_counts['chicken'] = count_flu(pre_flu_counts['chicken'], all_elmSeqs)
+flu_counts['human'] = count_flu(pre_flu_counts['human'], flu_elm2seq)
+flu_counts['chicken'] = count_flu(pre_flu_counts['chicken'], flu_elm2seq)
 
-host_seqs = []
+host_elm2seq = defaultdict(dict)
 for host in hosts:
-    host_counts[host] = defaultdict(utils.init_zero)
     with open('../flu/flELM/results/roundup_all/elmdict_' + host + '.init') as f:
         for line in f:
             (elm, seq, count, fq) = line.strip().split('\t')
-            elmSeq = elm + ':' + seq
-            host_counts[host][elmSeq] += int(count)
-            host_seqs.append(seq)
+            host_elm2seq[elm][seq] = True
 
-flu_seqs = []
-for flu in flu_counts:
-    for elmSeq in flu_counts[flu]:
-        elm, seq = elmSeq.split(':')
-        flu_seqs.append(seq)
-
-get_closest_distances(flu_seqs, host_seqs)
+for elm in flu_elm2seq:
+    print_closest_distances(elm, flu_elm2seq[elm], host_elm2seq[elm])
 
 
 
