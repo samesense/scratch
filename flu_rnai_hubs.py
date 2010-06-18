@@ -23,6 +23,7 @@ flu_rnai_file = '../Thesis/Data/Network/Flu/cell09/all_rnai'
 hubs_file = '../Thesis/Data/Hubs2/HPRD.entrez.expand.hubs20'
 net_file = '../Thesis/Data/Network/Human/HPRD/hprd_new.intr.ls.entrez'
 
+
 network_genes = set(utils_graph.getNodes(net_file))
 hubs = set(utils_graph.getNodes(hubs_file))
 
@@ -33,7 +34,7 @@ with open(flu_rnai_file) as f:
         [entrez, delNS1, 
          vRNA, replication] = [float(x) for x in line.strip().split('\t')]
         ID = str(int(entrez))
-        if vRNA > float(1):
+        if vRNA < float(0):
             replication_rnai[ID] = True
         all_rnai[ID] = True
 
@@ -51,6 +52,11 @@ bg_nonHubs = set(bg - hubs) - rep_nonHubs
 
 print len(bg_hubs), len(bg_nonHubs)
 print len(hubs & rep_set), len(rep_nonHubs)
-print utils_stats.fisher_positive_pval([len(bg_hubs), len(bg_nonHubs)],
-                                       [len(hubs & rep_set),
-                                        len(rep_nonHubs)])
+p_pval = utils_stats.fisher_positive_pval([len(bg_hubs), len(bg_nonHubs)],
+                                          [len(hubs & rep_set),
+                                           len(rep_nonHubs)])
+n_pval =  utils_stats.fisher_negative_pval([len(bg_hubs), len(bg_nonHubs)],
+                                           [len(hubs & rep_set),
+                                            len(rep_nonHubs)])
+print 'positive assoc', p_pval
+print 'neg assoc', n_pval
