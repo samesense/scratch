@@ -104,7 +104,7 @@ def mk_count_dists(vecs):
         dists[host] = utils.getDistFromCount(vecs[host])
     return dists
 
-hosts = ('H_sapiens', 'Gallus_gallus')
+hosts = global_settings.TEST_GENOMES
 flus = ('human', 'chicken')
 proteins = ('hemagglutinin', 'neuraminidase', 'nucleocapsid protein',
             'matrix protein 1', 'nonstructural protein 1', 'matrix protein 2',
