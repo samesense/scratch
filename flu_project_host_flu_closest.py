@@ -34,7 +34,7 @@ def print_closest_distances(elm, flu_strings, host_strings):
         for host_s in host_strings:
             dis = Levenshtein.distance(flu_s, 
                                        host_s)
-            if dis < 4:
+            if dis < 5:
                 print elm + '\t' + flu_s + '\t' + host_s + '\t' + str(dis)
 
 def count_0s(ls):
